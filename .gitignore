@@ -1,0 +1,6 @@
+node_modules/
+dist/
+coverage/
+*.tgz
+# The end-to-end suite's generated certificates, allowlist and logs.
+e2e/.work/

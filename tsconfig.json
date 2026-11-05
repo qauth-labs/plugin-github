@@ -1,0 +1,20 @@
+{
+  // Type-checks everything: the plugin, its tests and the end-to-end suite.
+  // The published build is tsconfig.build.json.
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "types": ["node"],
+    "skipLibCheck": false,
+    "noEmit": true
+  },
+  "include": ["src", "test", "e2e", "*.ts"]
+}

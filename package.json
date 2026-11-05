@@ -1,0 +1,67 @@
+{
+  "name": "@qauth-labs/plugin-github",
+  "version": "0.1.0-rc.0",
+  "description": "GitHub sign-in for QAuth, as an AuthMethod plugin: OAuth 2.0 with PKCE and GitHub's user API, keyed by the numeric GitHub user id. Experimental.",
+  "keywords": [
+    "qauth",
+    "qauth-plugin",
+    "auth-method",
+    "github",
+    "oauth",
+    "sign-in"
+  ],
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/qauth-labs/plugin-github#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qauth-labs/plugin-github.git"
+  },
+  "bugs": {
+    "url": "https://github.com/qauth-labs/plugin-github/issues"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=26.10.0"
+  },
+  "packageManager": "pnpm@12.14.0",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "oxlint",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "test": "vitest run",
+    "e2e": "bash e2e/run.sh",
+    "prepack": "pnpm run build"
+  },
+  "dependencies": {
+    "@qauth-labs/plugin-sdk": "0.2.0-rc.1"
+  },
+  "peerDependencies": {
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "oxfmt": "0.73.0",
+    "oxlint": "1.88.0",
+    "typescript": "~6.0.3",
+    "vitest": "^5.0.5",
+    "zod": "^4.6.7"
+  }
+}

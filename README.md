@@ -110,7 +110,18 @@ The image is a self-contained tree under `/app`. Install the plugin into a
 separate stage, nested, so it brings its own copy of the plugin SDK, and copy
 it in. `--omit=peer` makes it use the server's own `zod`; `--ignore-scripts`
 runs no install script. Pin the server image by digest and the plugin by
-version:
+version, and install from a lockfile you have read, so every build gets the
+same dependency tree. Write the lockfile once, in a `plugins/` directory of
+your build context, without installing anything:
+
+```bash
+mkdir plugins && cd plugins
+npm init --yes > /dev/null
+npm install --package-lock-only --save-exact --omit=dev --omit=peer \
+  --install-strategy=nested --ignore-scripts @qauth-labs/plugin-github@0.1.0-rc.0
+```
+
+Read `package-lock.json` and commit both files. Then:
 
 ```dockerfile
 ARG QAUTH_IMAGE=ghcr.io/qauth-labs/qauth/auth-server:0.2.0-rc.1@sha256:<digest>
@@ -118,9 +129,8 @@ ARG QAUTH_IMAGE=ghcr.io/qauth-labs/qauth/auth-server:0.2.0-rc.1@sha256:<digest>
 # The build stage writes the files the server will run: pin it by digest too.
 FROM node:26-alpine@sha256:<digest> AS plugin
 WORKDIR /plugin
-RUN npm init --yes > /dev/null \
- && npm install --omit=dev --omit=peer --install-strategy=nested --ignore-scripts \
-      @qauth-labs/plugin-github@0.1.0-rc.0
+COPY plugins/package.json plugins/package-lock.json ./
+RUN npm ci --omit=dev --omit=peer --install-strategy=nested --ignore-scripts
 
 FROM ${QAUTH_IMAGE}
 COPY --from=plugin --chown=nodejs:nodejs \
@@ -128,7 +138,9 @@ COPY --from=plugin --chown=nodejs:nodejs \
   /app/node_modules/@qauth-labs/plugin-github
 ```
 
-Rebuild it at every QAuth upgrade. To know the package was built by this
+Rebuild it at every QAuth upgrade, with the lockfile moved to the plugin
+version made for that release by the same `npm install --package-lock-only`.
+To know the package was built by this
 repository's release workflow, read the version's provenance on npmjs.com,
 or the attestation at
 `npm view @qauth-labs/plugin-github@<version> dist.attestations.url`, and

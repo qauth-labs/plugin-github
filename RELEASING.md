@@ -22,13 +22,8 @@ The package has its own version line, not QAuth's.
 
 ## Cut a release
 
-1. In a pull request, set the version and its changelog section:
-
-   ```sh
-   npm version --no-git-tag-version 0.1.0-rc.1
-   ```
-
-   Move the `Unreleased` entries of `CHANGELOG.md` under `## [0.1.0-rc.1]`,
+1. In a pull request, set `version` in `package.json` (for example
+   `0.1.0-rc.1`) and move the `Unreleased` entries of `CHANGELOG.md` under `## [0.1.0-rc.1]`,
    update the links at the bottom and the README's compatibility table. Merge
    it when CI is green.
 
@@ -42,8 +37,8 @@ The package has its own version line, not QAuth's.
 3. `release.yml` runs the whole CI again (checks, contract test kit,
    end-to-end suite), checks that the tag points at a commit on `main`, that
    it names the version in `package.json` and that `CHANGELOG.md` has its
-   section, packs the tarball once and stages
-   it on npm (`npm stage publish`), from the `npm` environment.
+   section, builds and packs the tarball once with pnpm and stages it on npm
+   (`npm stage publish`), from the `npm` environment.
 
 4. Approve the stage on npmjs.com with 2FA. Check the version, the dist-tag
    and the provenance before approving.

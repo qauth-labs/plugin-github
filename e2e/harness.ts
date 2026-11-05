@@ -10,14 +10,16 @@ import {
   createHash,
   createPrivateKey,
   generateKeyPairSync,
-  type JsonWebKey,
   type KeyObject,
   randomBytes,
   randomUUID,
   sign,
+  type webcrypto,
 } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+
+type JsonWebKey = webcrypto.JsonWebKey;
 
 /** The server's public listener, as the suite reaches it. */
 export const SERVER = 'http://localhost:3000';

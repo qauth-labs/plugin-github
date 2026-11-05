@@ -1,0 +1,15 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  // QAuth's own formatting options (qauth-labs/qauth's .oxfmtrc.json).
+  "semi": true,
+  "trailingComma": "es5",
+  "singleQuote": true,
+  "printWidth": 100,
+  "tabWidth": 2,
+  "useTabs": false,
+  "arrowParens": "always",
+  "endOfLine": "lf",
+  "sortPackageJson": false,
+  // Gitignore-style; .gitignore applies too.
+  "ignorePatterns": ["node_modules", "dist", "coverage", "*.log", "pnpm-lock.yaml", "e2e/.work"]
+}

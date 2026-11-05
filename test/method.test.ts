@@ -13,8 +13,8 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { configSchema, type GitHubConfig } from '../src/config.js';
 import { authMethod, type GitHubTransaction } from '../src/index.js';
-import { CONFIG, FakeGitHub } from './fake-github.js';
 import { type FakeContext, fakeContext, REALM_ORIGIN } from './fake-context.js';
+import { CONFIG, FakeGitHub } from './fake-github.js';
 
 const callback = authMethod.routes[0] as AuthMethodCallbackRoute<GitHubConfig, GitHubTransaction>;
 

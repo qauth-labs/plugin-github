@@ -206,19 +206,24 @@ sign you in", and the server logs `egress call blocked`.
 
 ## Develop
 
+The repository uses QAuth's own toolchain: Node 26, pnpm (the version in
+`package.json`'s `packageManager`), TypeScript, Oxlint, Oxfmt and Vitest.
+pnpm resolves a dependency version only once it has been on the registry
+for 7 days (`pnpm-workspace.yaml`), as QAuth does.
+
 ```sh
-npm ci
-npm run lint && npm run typecheck && npm test
+pnpm install
+pnpm run lint && pnpm run format:check && pnpm run typecheck && pnpm test
 ```
 
-`npm test` runs the unit tests against a fake GitHub, and the plugin SDK's
+`pnpm test` runs the unit tests against a fake GitHub, and the plugin SDK's
 contract test kit (`checkAuthMethod`), for github.com and for an Enterprise
 Server.
 
-The end-to-end suite needs docker, openssl and Node:
+The end-to-end suite needs docker, openssl, Node and pnpm:
 
 ```sh
-bash e2e/run.sh
+pnpm run e2e
 ```
 
 It packs the plugin, builds QAuth's released server image with the plugin

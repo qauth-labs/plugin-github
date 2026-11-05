@@ -1,12 +1,12 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   // QAuth's own rule set (qauth-labs/qauth's .oxlintrc.json): @eslint/js and
-  // typescript-eslint `recommended` as Nx configures them, and
-  // simple-import-sort, less the Nx module boundaries and QAuth's key custody
-  // guard, which concern QAuth's own workspace. Oxlint's default category is
-  // off, so nothing else runs. Formatting is Oxfmt's job (.oxfmtrc.json).
+  // typescript-eslint `recommended` as Nx configures them, less the Nx module
+  // boundaries and QAuth's key custody guard, which concern QAuth's own
+  // workspace. Oxlint's default category is off, so nothing else runs.
+  // Formatting and the order of imports are Oxfmt's job (.oxfmtrc.json): no
+  // ESLint plugin, so no ESLint in the tree.
   "plugins": ["eslint", "typescript"],
-  "jsPlugins": ["eslint-plugin-simple-import-sort"],
   "categories": {
     "correctness": "off"
   },
@@ -86,10 +86,7 @@
     "typescript/no-wrapper-object-types": "error",
     "typescript/prefer-as-const": "error",
     "typescript/prefer-namespace-keyword": "error",
-    "typescript/triple-slash-reference": "error",
-
-    "simple-import-sort/imports": "error",
-    "simple-import-sort/exports": "error"
+    "typescript/triple-slash-reference": "error"
   },
   "overrides": [
     {

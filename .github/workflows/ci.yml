@@ -1,0 +1,61 @@
+# Every pull request, and the release before it stages anything (release.yml
+# calls this workflow): format, lint, type-check, the unit tests and the
+# plugin SDK's contract test kit (checkAuthMethod), the build and the
+# tarball's file list; then the end-to-end suite, which runs the released
+# QAuth server image with this plugin installed on top, against a mock
+# GitHub (e2e/README.md).
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        # The oldest Node the package supports, and the one QAuth's image runs.
+        node: [22, 26]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run typecheck
+      - name: Unit tests and the SDK's contract test kit (checkAuthMethod)
+        run: npm test
+      - run: npm run build
+      - name: The files npm would publish
+        run: npm pack --dry-run --ignore-scripts
+
+  e2e:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: The released server image plus the plugin, against a mock GitHub
+        run: bash e2e/run.sh

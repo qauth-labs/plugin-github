@@ -1,0 +1,9 @@
+{
+  "entries": [
+    {
+      "host": "mock-github",
+      "realms": ["master"],
+      "note": "The mock GitHub Enterprise Server. Its other name, mock-github-unlisted, is not here."
+    }
+  ]
+}

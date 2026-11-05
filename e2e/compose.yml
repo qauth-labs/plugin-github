@@ -1,0 +1,138 @@
+# The end-to-end suite's deployment (run.sh starts it): QAuth's released
+# images, the server with this plugin added (Dockerfile), and a mock GitHub
+# Enterprise Server on the deployment's private network.
+#
+# The mock answers to two names. `mock-github` is on the operator's egress
+# allowlist (egress-allowlist.json) and `mock-github-unlisted` is not, so the
+# suite can show that a private base URL works only where the allowlist names
+# it. The server's egress client resolves names through DNS, so both are
+# network aliases.
+#
+# The secrets (JWT keys, KEK, session cookie secret, the mock's client
+# secret) come from run.sh's environment, made fresh for each run.
+name: plugin-github-e2e
+
+x-server: &server
+  build:
+    context: .
+    dockerfile: Dockerfile
+  image: plugin-github-e2e/auth-server:local
+  environment: &server-env
+    NODE_ENV: production
+    HOST: 0.0.0.0
+    PORT: '3000'
+    LOG_LEVEL: info
+    DATABASE_URL: postgres://qauth:qauth@postgres:5432/qauth
+    REDIS_URL: redis://redis:6379/0
+    REDIS_HOST: redis
+    REDIS_PORT: '6379'
+    REDIS_DB: '0'
+    JWT_PRIVATE_KEY: ${JWT_PRIVATE_KEY:?run e2e/run.sh}
+    JWT_PUBLIC_KEY: ${JWT_PUBLIC_KEY:?run e2e/run.sh}
+    JWT_ISSUER: http://localhost:3000
+    KEK: ${KEK:?run e2e/run.sh}
+    SESSION_COOKIE_SECRET: ${SESSION_COOKIE_SECRET:?run e2e/run.sh}
+    # The suite talks to the server over plain http on localhost.
+    SESSION_COOKIE_SECURE: 'false'
+    # The first boot seeds the master realm with sign-up allowed, so a first
+    # sign-in through GitHub creates the account.
+    ALLOW_SIGN_UP: 'true'
+    # The suite signs in a dozen times from one address.
+    RATE_LIMIT_MAX: '10000'
+    LOGIN_RATE_LIMIT: '1000'
+    AUTHORIZE_RATE_LIMIT: '1000'
+    TOKEN_RATE_LIMIT: '1000'
+    REGISTER_CLIENT_RATE_LIMIT: '100'
+    # The plugin, as an operator installs it.
+    AUTH_METHOD_PLUGINS: '@qauth-labs/plugin-github'
+    PLUGIN_API_ENABLED: 'true'
+    EGRESS_ALLOWLIST_PATH: /etc/qauth/egress-allowlist.json
+    # The mock's certificate is signed by run.sh's throwaway CA.
+    NODE_EXTRA_CA_CERTS: /etc/qauth/e2e-ca.crt
+    # The admin API configures the plugin for the realm. Its base URL is only
+    # what DPoP proofs name (htu); the suite reaches it on port 3002.
+    ADMIN_API_ENABLED: 'true'
+    ADMIN_API_HOST: 0.0.0.0
+    ADMIN_API_PORT: '3002'
+    ADMIN_API_BASE_URL: https://admin.qauth.test
+    DPOP_ENABLED: 'true'
+  volumes:
+    - ./egress-allowlist.json:/etc/qauth/egress-allowlist.json:ro
+    - ./.work/certs/ca.crt:/etc/qauth/e2e-ca.crt:ro
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: qauth
+      POSTGRES_USER: qauth
+      POSTGRES_PASSWORD: qauth
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U qauth -d qauth']
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  migrate:
+    image: ghcr.io/qauth-labs/qauth/migration-runner:0.2.0-rc.1@sha256:d4c47545e04b1fd78f16146ffd8e20f02983722d20a71ffbfde4c4c8c95599f6
+    environment:
+      DATABASE_URL: postgres://qauth:qauth@postgres:5432/qauth
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  mock-github:
+    image: node:26-alpine@sha256:c6ad9e9c1d80f6eb607c26b4b0a132ff7a2344fad1c78ea3baa2a7d4c8de6d94
+    command: ['node', '/mock/server.mjs']
+    environment:
+      MOCK_GITHUB_CLIENT_ID: ${MOCK_GITHUB_CLIENT_ID:?run e2e/run.sh}
+      MOCK_GITHUB_CLIENT_SECRET: ${MOCK_GITHUB_CLIENT_SECRET:?run e2e/run.sh}
+    volumes:
+      - ./mock-github:/mock:ro
+      - ./.work/certs:/certs:ro
+    networks:
+      default:
+        aliases: [mock-github-unlisted]
+    # The suite plays the browser at the mock's authorization page, and reads
+    # its control API, from the host.
+    ports:
+      - 127.0.0.1:8443:8443
+
+  auth-server:
+    <<: *server
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+      mock-github:
+        condition: service_started
+    ports:
+      - 127.0.0.1:3000:3000
+      - 127.0.0.1:3002:3002
+
+  # The same image and plugin with the experimental plugin API off: the boot
+  # must skip the plugin and say why. run.sh starts it after the first server
+  # has seeded the database.
+  auth-server-plugin-api-off:
+    <<: *server
+    environment:
+      <<: *server-env
+      PLUGIN_API_ENABLED: 'false'
+      ADMIN_API_ENABLED: 'false'
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    ports:
+      - 127.0.0.1:3010:3000
+    profiles: [plugin-api-off]

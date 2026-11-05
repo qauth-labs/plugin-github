@@ -1,0 +1,69 @@
+{
+  "name": "@qauth-labs/plugin-github",
+  "version": "0.1.0-rc.0",
+  "description": "GitHub sign-in for QAuth, as an AuthMethod plugin: OAuth 2.0 with PKCE and GitHub's user API, keyed by the numeric GitHub user id. Experimental.",
+  "keywords": [
+    "qauth",
+    "qauth-plugin",
+    "auth-method",
+    "github",
+    "oauth",
+    "sign-in"
+  ],
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/qauth-labs/plugin-github#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qauth-labs/plugin-github.git"
+  },
+  "bugs": {
+    "url": "https://github.com/qauth-labs/plugin-github/issues"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "e2e": "vitest run --config e2e/vitest.config.ts",
+    "prepack": "npm run build"
+  },
+  "dependencies": {
+    "@qauth-labs/plugin-sdk": "0.2.0-rc.1"
+  },
+  "peerDependencies": {
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^22.19.0",
+    "eslint": "^10.14.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.9.10",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.1",
+    "vitest": "^5.1.0",
+    "zod": "^4.6.7"
+  }
+}

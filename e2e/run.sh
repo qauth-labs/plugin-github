@@ -3,9 +3,9 @@
 # installed the way an operator installs it, against a mock GitHub Enterprise
 # Server, driven over HTTP by e2e/github.e2e.test.ts.
 #
-# Needs docker (with compose), openssl and node. Run it from anywhere:
+# Needs docker (with compose), openssl, node and pnpm. Run it from anywhere:
 #
-#   bash e2e/run.sh
+#   pnpm run e2e
 #
 # It packs the plugin as npm would publish it, makes throwaway secrets and a
 # throwaway CA in e2e/.work/, builds the image (e2e/Dockerfile), starts the
@@ -51,7 +51,7 @@ export MOCK_GITHUB_CLIENT_ID MOCK_GITHUB_CLIENT_SECRET
 chmod 644 "$here/egress-allowlist.json"
 
 # The plugin as npm would receive it.
-(cd "$root" && npm pack --silent --pack-destination "$work/pack" > /dev/null)
+(cd "$root" && pnpm run build > /dev/null && pnpm pack --pack-destination "$work/pack" > /dev/null)
 cp "$work"/pack/*.tgz "$work/plugin.tgz"
 
 finish() {
@@ -67,10 +67,15 @@ finish() {
 trap finish EXIT
 
 wait_ready() {
-  local url="$1"
+  local url="$1" service="$2"
   for _ in $(seq 1 120); do
     if curl --silent --fail "$url" 2> /dev/null | grep -q '"status":"ok"'; then
       return 0
+    fi
+    # A server that stopped at boot will not become ready: stop waiting.
+    if [ -n "$("${compose[@]}" --profile plugin-api-off ps --quiet --status exited "$service")" ]; then
+      echo "$service stopped during its boot" >&2
+      return 1
     fi
     sleep 1
   done
@@ -80,13 +85,13 @@ wait_ready() {
 
 "${compose[@]}" build auth-server
 "${compose[@]}" up --detach auth-server
-wait_ready http://localhost:3000/ready
+wait_ready http://localhost:3000/ready auth-server
 # The second server boots on the database the first one seeded.
 "${compose[@]}" --profile plugin-api-off up --detach --no-build auth-server-plugin-api-off
-wait_ready http://localhost:3010/ready
+wait_ready http://localhost:3010/ready auth-server-plugin-api-off
 
 cd "$root"
 E2E_COMPOSE_FILE="$here/compose.yml" \
 E2E_WORK="$work" \
 NODE_EXTRA_CA_CERTS="$work/certs/ca.crt" \
-  npx vitest run --config e2e/vitest.config.ts
+  pnpm exec vitest run --config e2e/vitest.config.ts

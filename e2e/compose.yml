@@ -34,6 +34,9 @@ x-server: &server
     SESSION_COOKIE_SECRET: ${SESSION_COOKIE_SECRET:?run e2e/run.sh}
     # The suite talks to the server over plain http on localhost.
     SESSION_COOKIE_SECURE: 'false'
+    # Required at boot; the suite sends no mail (the mock email provider).
+    EMAIL_FROM_ADDRESS: noreply@qauth.test
+    EMAIL_BASE_URL: http://localhost:3000
     # The first boot seeds the master realm with sign-up allowed, so a first
     # sign-in through GitHub creates the account.
     ALLOW_SIGN_UP: 'true'

@@ -20,6 +20,7 @@ and has its own version line.
 
 | Plugin       | QAuth server                    | AuthMethod contract        | Plugin SDK   |
 | ------------ | ------------------------------- | -------------------------- | ------------ |
+| `0.1.0`      | `0.2.0` and later on `0.2`      | `qauth-auth-method/1-rc.0` | `0.2.0`      |
 | `0.1.0-rc.0` | `0.2.0-rc.1` and later on `0.2` | `qauth-auth-method/1-rc.0` | `0.2.0-rc.1` |
 
 ## How it signs a person in
@@ -88,7 +89,7 @@ would need a real account.
 
 ## Install it (operators)
 
-You need QAuth `0.2.0-rc.1` or later, and an image you build on top of
+You need QAuth `0.2.0` or later, and an image you build on top of
 QAuth's released one.
 
 ### 1. Register the app on GitHub
@@ -118,13 +119,13 @@ your build context, without installing anything:
 mkdir plugins && cd plugins
 npm init --yes > /dev/null
 npm install --package-lock-only --save-exact --omit=dev --omit=peer \
-  --install-strategy=nested --ignore-scripts @qauth-labs/plugin-github@0.1.0-rc.0
+  --install-strategy=nested --ignore-scripts @qauth-labs/plugin-github@0.1.0
 ```
 
 Read `package-lock.json` and commit both files. Then:
 
 ```dockerfile
-ARG QAUTH_IMAGE=ghcr.io/qauth-labs/qauth/auth-server:0.2.0-rc.1@sha256:<digest>
+ARG QAUTH_IMAGE=ghcr.io/qauth-labs/qauth/auth-server:0.2.0@sha256:<digest>
 
 # The build stage writes the files the server will run: pin it by digest too.
 FROM node:26-alpine@sha256:<digest> AS plugin

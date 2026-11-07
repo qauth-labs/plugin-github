@@ -9,9 +9,9 @@
 minimumReleaseAge: 10080
 minimumReleaseAgeExclude:
   # QAuth's plugin SDK, provenance-signed by qauth-labs/qauth's release-npm
-  # workflow at tag v0.2.0-rc.1: the contract this plugin is written against.
-  # Published 2026-11-05T09:17:29Z: remove after 2026-11-12T09:18Z.
-  - '@qauth-labs/plugin-sdk@0.2.0-rc.1'
+  # workflow at tag v0.2.0: the contract this plugin is written against.
+  # Published 2026-11-07T15:46:24Z: remove after 2026-11-14T15:47Z.
+  - '@qauth-labs/plugin-sdk@0.2.0'
 
 # Never auto-install before a script runs; warn when node_modules is stale.
 verifyDepsBeforeRun: warn

@@ -85,7 +85,7 @@ services:
       retries: 30
 
   migrate:
-    image: ghcr.io/qauth-labs/qauth/migration-runner:0.2.0-rc.1@sha256:d4c47545e04b1fd78f16146ffd8e20f02983722d20a71ffbfde4c4c8c95599f6
+    image: ghcr.io/qauth-labs/qauth/migration-runner:0.2.0@sha256:4393d4cc7aad293f37c3c4a10ffefca9cde2e8792db43885b80b1fe19030ebe4
     environment:
       DATABASE_URL: postgres://qauth:qauth@postgres:5432/qauth
     depends_on:

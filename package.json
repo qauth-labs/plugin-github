@@ -1,6 +1,6 @@
 {
   "name": "@qauth-labs/plugin-github",
-  "version": "0.1.0-rc.0",
+  "version": "0.1.0",
   "description": "GitHub sign-in for QAuth, as an AuthMethod plugin: OAuth 2.0 with PKCE and GitHub's user API, keyed by the numeric GitHub user id. Experimental.",
   "keywords": [
     "qauth",
@@ -51,7 +51,7 @@
     "prepack": "pnpm run build"
   },
   "dependencies": {
-    "@qauth-labs/plugin-sdk": "0.2.0-rc.1"
+    "@qauth-labs/plugin-sdk": "0.2.0"
   },
   "peerDependencies": {
     "zod": "^4.6.7"

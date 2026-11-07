@@ -8,6 +8,21 @@ release (RELEASING.md).
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-11-07
+
+The first release, on npm's `latest` dist-tag. Experimental: QAuth loads it
+only with `PLUGIN_API_ENABLED=true`, and its plugin API may change before
+QAuth 1.0.
+
+### Changed
+
+- For QAuth 0.2.0 and later on the 0.2 line. The plugin depends on the
+  released `@qauth-labs/plugin-sdk` `0.2.0` instead of its release candidate
+  `0.2.0-rc.1`. The AuthMethod contract is unchanged,
+  `qauth-auth-method/1-rc.0`.
+- The end-to-end suite runs against QAuth's released `0.2.0` server and
+  migration-runner images, pinned by digest.
+
 ## [0.1.0-rc.0]
 
 The first release candidate. Experimental: QAuth loads it only with
@@ -37,5 +52,6 @@ The first release candidate. Experimental: QAuth loads it only with
 - A release workflow that stages the package on npm through trusted
   publishing, for a maintainer's approval with 2FA.
 
-[Unreleased]: https://github.com/qauth-labs/plugin-github/compare/v0.1.0-rc.0...HEAD
+[Unreleased]: https://github.com/qauth-labs/plugin-github/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/qauth-labs/plugin-github/compare/v0.1.0-rc.0...v0.1.0
 [0.1.0-rc.0]: https://github.com/qauth-labs/plugin-github/releases/tag/v0.1.0-rc.0
